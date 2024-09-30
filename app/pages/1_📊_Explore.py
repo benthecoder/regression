@@ -16,18 +16,16 @@ datasets = os.listdir("datasets")
 selected_dataset = st.selectbox("Select a dataset", datasets)
 
 
-if selected_dataset == "evpopulation.csv":
+if selected_dataset == "gdp_per_capita.csv":
     st.write(
         """
-        ## Electric Vehicle Population
+        ## GDP per Capita
 
-        Source:  [Full Electric Vehicle Dataset 2024](https://www.kaggle.com/datasets/sahirmaharajj/electric-vehicle-population)
+        Source: [World Bank](https://data.worldbank.org/indicator/NY.GDP.PCAP.CD)
         
-        This dataset contains the population of different countries over the years."""
+        This dataset contains the GDP per capita of USA from 1960-2023."""
     )
 
-# fill for rest of datasets
-
-
-df = pd.read_csv(f"datasets/{selected_dataset}")
-st.write(df.head())
+    df = pd.read_csv(f"datasets/{selected_dataset}")
+    st.write(df.head())
+    st.line_chart(df, x="Year", y="GDP_per_capita")
