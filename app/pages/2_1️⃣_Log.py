@@ -91,7 +91,7 @@ y_pred = model.predict(X)
 
 data["log_GDP_per_capita"] = np.log(data["GDP_per_capita"])
 model_log = sm.OLS(data["log_GDP_per_capita"], X).fit()
-y_pred_log = np.exp(model_log.predict(X))
+y_pred_log = model_log.predict(X)
 
 # Plot before and after transformation side by side
 st.write("## Regression Plots: Before and After Log Transformation")
@@ -113,11 +113,11 @@ with col2:
     st.pyplot(
         plot_regression(
             data["Year"],
-            y,
+            data["log_GDP_per_capita"],
             y_pred_log,
             "Log-transformed Regression",
             "Year",
-            "GDP per capita",
+            "log(GDP per capita)",
         )
     )
 
