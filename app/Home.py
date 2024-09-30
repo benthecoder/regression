@@ -24,9 +24,9 @@ st.markdown(
 
 
     ### Team members:
-    - Benedict Neo
-    - Adrian Lam Lorn Hin
-    - Nicholas Barsi-Rhyne  
-    - Rebekah Zhou  
+    - [Adrian Lam Lorn Hin](https://www.linkedin.com/in/adrianlhlam/)
+    - [Benedict Neo](https://www.linkedin.com/in/benedictneo/)
+    - [Nicholas Barsi-Rhyne](https://www.linkedin.com/in/nicholas-barsi-rhyne-64a006204/)
+    - [Rebekah Zhou](https://www.linkedin.com/in/rebekahzhou/)
 """
 )
