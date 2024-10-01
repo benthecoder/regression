@@ -6,6 +6,8 @@ import statsmodels.api as sm
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+from numpy.polynomial.legendre import Legendre
 from scipy import stats
 
 st.set_page_config(
@@ -138,45 +140,57 @@ with col1:
     #### Interpretation:
     In the standard model, the coefficient for Year represents the average increase in GDP per capita for each year.
     
-    Coefficient for Year: {:.2f}
+    Coefficient for Concentration: {:.2f}
     
-    This means that, on average, GDP per capita increases by ${:.2f} each year.
-    """.format(model.params["Year"], model.params["Year"])
+    This means that, on average, reaction increases by every {:.2f} amount of reagent added.
+    """.format(model.params["concentration"], model.params["concentration"])
     )
 
 with col2:
-    st.write("### Log-transformed Regression")
+    st.write("### Poly-transformed Regression")
     st.write(
-        f"R-squared: {r2_score(data['log_GDP_per_capita'],model_poly.predict(X)):.4f}"
+        f"R-squared: {r2_score(y, y_pred_poly):.4f}"
     )
     st.write(
-        f"Mean Squared Error: {mean_squared_error(data['log_GDP_per_capita'], model_poly.predict(X)):.4f}"
+        f"Mean Squared Error: {mean_squared_error(y, y_pred_poly):.4f}"
     )
 
-    year_coef = model_poly.params["Year"]
-    percentage_change = (np.exp(year_coef) - 1) * 100
+    coefficients = model_poly.coef_
+    powers = poly.powers_
 
     st.markdown(
-        """
+        r"""
     #### Interpretation:
-    In the log-transformed model, the coefficient for Year represents the average percentage increase in GDP per capita for each year.
+    In the poly-transformed model, the coefficient are a little harder to interprate but we can try.
     
-    Coefficient for Year: {:.4f}
+    $\beta_0={:.4f}$<br>
+    $\beta_1={:.4f}$<br>
+    $\beta_2={:.4f}$<br>
+    $\beta_3={:.4f}$<br>
+    $\beta_4={:.4f}$<br>
     
-    This means that, on average, GDP per capita increases by {:.2f}% each year.
-    """.format(year_coef, percentage_change)
+    However this is hard to interperate because in our model we have..
+
+    $X_i^1$<br>
+    $X_i^2$<br>
+    $X_i^3$<br>
+    $X_i^4$<br>
+    
+    In our training data.
+    """.format(coefficients[0],coefficients[1],coefficients[2],coefficients[3],coefficients[4]),
+    unsafe_allow_html=True
     )
 
 st.markdown(
     """
-    ### Why log is better:
-The log-transformed model often provides a better fit for economic data like GDP per capita because:
+    ### Why poly-transform is better:
+The 4th-degree polynomial transformation often provides a better fit for complex, non-linear relationships in data because:
 
-1. It captures the exponential growth pattern typically seen in economic indicators.
-2. It allows for interpretation in terms of percentage changes, which is more intuitive for economic analysis.
-3. It can help address issues of heteroscedasticity (uneven variance) in the residuals.
+1. It captures intricate patterns in the data that a simple linear model cannot, accommodating curves and multiple inflection points.
+2. It increases the model's flexibility, allowing it to adapt to upward and downward trends within the dataset.
+3. It can significantly improve model accuracy when the relationship between the variables is non-linear.
 
-As we can see from the R-squared values, the log-transformed model explains a larger proportion of the variance in the data, indicating a better fit.
+As seen from the R-squared values, the polynomial-transformed model better explains the variance in the data, indicating an improved fit over standard linear models. However, care should be taken to avoid overfitting, especially with higher-degree polynomials.
 
 """
 )
@@ -191,14 +205,14 @@ col1, col2 = st.columns(2)
 
 with col1:
     st.pyplot(
-        plot_residuals(data["Year"], y - y_pred,
-                       "Residuals: Standard Model", "Year")
+        plot_residuals(data["concentration"], y - y_pred,
+                       "Residuals: Standard Model", "Concentration")
     )
 
 with col2:
     st.pyplot(
         plot_residuals(
-            data["Year"], y - y_pred_log, "Residuals: Log-transformed Model", "Year"
+            data["concentration"], y - y_pred_poly, "Residuals: Poly-transformed Model", "Concentration"
         )
     )
 
@@ -217,14 +231,19 @@ with col1:
 
 with col2:
     st.pyplot(
-        plot_qq(np.log(y) - model_poly.predict(X),
-                "Q-Q Plot: Log-transformed Model")
+        plot_qq(y - y_pred_poly,
+                "Q-Q Plot: Poly-transformed Model")
     )
 
 st.markdown(
     """
-    Q-Q plots help us assess the normality of residuals. Points closer to the diagonal line indicate a better fit to 
-    the normal distribution. The log-transformed model often shows improvement in normality of residuals.
+    While both Q-Q plots appear reasonably aligned with the theoretical quantiles, suggesting that the residuals are approximately normally distributed for both models, it is crucial to be cautious about relying solely on Q-Q plots for model evaluation.
+
+Q-Q plots provide insight into the distribution of residuals but do not capture all aspects of model performance, such as:
+
+1. Heteroscedasticity: Changes in the variance of residuals across the range of predictors.
+2. Model Fit: How well the model captures the underlying relationship between the variables.
+3. Outliers or Influential Points: These may not be fully apparent in the Q-Q plot.
     """
 )
 
@@ -232,32 +251,83 @@ st.markdown(
     """
     ## Conclusion
 
-    In this analysis, we've seen how log transformation can improve the fit of a linear regression model:
+In this analysis, we've seen how polynomial transformation can improve the fit of a regression model:
 
-    1. The residuals in the log-transformed model show less pattern and are more evenly distributed.
-    2. The R-squared value improved after log transformation, indicating a better fit.
-    3. The Q-Q plot for the log-transformed model shows points closer to the diagonal line,
-       suggesting that the residuals are closer to a normal distribution.
+* The polynomial model captures the non-linear relationship between the variables more effectively than the standard linear model.
+* The R-squared value improved after applying the polynomial transformation, indicating a better overall fit to the data.
+* The Q-Q plot for the polynomial-transformed model shows residuals that are more aligned with the theoretical quantiles, suggesting that the assumptions of normality are reasonably met.
 
-    Log transformation is often useful when dealing with economic data like GDP, as it can help
-    address issues of heteroscedasticity and non-linearity in the relationship between variables.
+Polynomial transformation is often useful when dealing with data that exhibits curvature or complex patterns. It allows the model to adapt to non-linear trends, potentially leading to more accurate predictions and better representation of the underlying data structure. However, care must be taken to select an appropriate degree of the polynomial to avoid overfitting.
 """
 )
 
-st.write("## Appendix: Detailed Model Summaries")
+st.write("## Extra details")
 col1, col2 = st.columns(2)
 
-with col1:
-    st.write("### Standard Model Summary")
-    st.text(model.summary().as_text())
+# Step 1: Standardize the input data 'concentration' to [-1, 1]
+# Assuming `data` is a DataFrame containing the column 'concentration'
+X = data["concentration"].values
+X_standardized = 2 * (X - X.min()) / (X.max() - X.min()) - 1  # scale to [-1, 1]
 
-with col2:
-    st.write("### Log-transformed Model Summary")
-    st.text(model_poly.summary().as_text())
+# Step 2: Generate Legendre polynomial features
+degree = 4  # Assuming you want to use a 4th-degree Legendre polynomial
+legendre_features = [Legendre.basis(d)(X_standardized) for d in range(degree + 1)]
+
+# Stack the features into a design matrix
+X_legendre = np.column_stack(legendre_features)
+
+X_L_vif = pd.DataFrame(X_legendre, columns=[f'B_{i}' for i in range(X_legendre.shape[1])])
+X_vif = pd.DataFrame(X_poly, columns=[f'P_{i}' for i in range(5)])
+
+# Calculate VIF for each column
+vif_L_data = pd.DataFrame()
+vif_L_data['Feature'] = X_L_vif.columns
+vif_L_data['VIF'] = [variance_inflation_factor(X_L_vif.values, i) for i in range(X_L_vif.shape[1])]
+
+vif_data = pd.DataFrame()
+vif_data['Feature'] = X_vif.columns
+vif_data['VIF'] = [variance_inflation_factor(X_vif.values, i) for i in range(X_vif.shape[1])]
 
 st.markdown(
     """
-    These summaries provide detailed statistical information about both models, including coefficient estimates, 
-    standard errors, t-statistics, and p-values.
+    It should be noted that there are other downsides to using a naive polynomial regression. Standard polynomial regression terms can be highly correlated and can lead to large coefficients, making the model prone to overfitting and sensitive to noise in the data.
+
+    To check to see if we have colinearity within our data we can preform VIF tests. For the naive approuch our VIF tests are:
     """
+    r"""
+    $\beta_0={:.4f}$<br>
+    $\beta_1={:.4f}$<br>
+    $\beta_2={:.4f}$<br>
+    $\beta_3={:.4f}$<br>
+    $\beta_4={:.4f}$<br>
+    """.format(vif_data['VIF'][0],vif_data['VIF'][1],vif_data['VIF'][2],vif_data['VIF'][3],vif_data['VIF'][4])
+    +
+    """ 
+    We should be concered about the colinearity of our columns if the VIF value is above 10 for any predictor. With our values we should be very concerned.
+    
+    **Solution: Legendre Polynomial**
+    The primary reasons to use Legendre polynomials in linear regression are to avoid multicollinearity, enhance numerical stability, and improve model generalization when dealing with non-linear relationships. Standard polynomial regression terms can be highly correlated and can lead to large coefficients, making the model prone to overfitting and sensitive to noise in the data. Legendre polynomials, being orthogonal and bounded, help alleviate these issues.
+    """
+    +
+    r"""
+    Legendre Polynomial are defined as 
+
+    $P_n(x) = \frac{1}{2^n n!} \frac{d^n}{dx^n} \left[(x^2 - 1)^n\right]$
+
+    where $P_n(x)$ is the $n$-th Legendre polynomial and x is the variable.
+    """
+    +
+    r"""
+    After calulating the new Legendre polynomials we can rerun the VIF test to see if we have improvment in the colinearity of the columns.
+
+
+    $\beta_0={:.4f}$<br>
+    $\beta_1={:.4f}$<br>
+    $\beta_2={:.4f}$<br>
+    $\beta_3={:.4f}$<br>
+    $\beta_4={:.4f}$<br>
+
+    By using Legendre polynomials, you improve the stability and interpretability of your polynomial regression model, particularly when dealing with higher degrees.
+    """.format(vif_L_data['VIF'][0],vif_L_data['VIF'][1],vif_L_data['VIF'][2],vif_L_data['VIF'][3],vif_L_data['VIF'][4]),
+    unsafe_allow_html=True
 )
