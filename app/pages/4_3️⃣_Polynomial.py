@@ -16,7 +16,7 @@ st.set_page_config(
     layout="wide",
 )
 
-st.write("# Polynomia Transformation")
+st.write("# Polynomial Transformation")
 
 st.markdown(
     """
