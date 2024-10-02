@@ -100,7 +100,7 @@ y_pred_poly = model_poly.predict(X_poly)
 
 
 # Plot before and after transformation side by side
-st.write("## Regression Plots: Before and After Log Transformation")
+st.write("## Regression Plots: Before and After Poly Transformation")
 col1, col2 = st.columns(2)
 
 with col1:
@@ -219,7 +219,7 @@ with col2:
 st.markdown(
     """
     The residual plots help us assess the homoscedasticity assumption. Ideally, we want to see a random scatter of points 
-    with consistent spread. The log-transformed model often shows improvement in this regard.
+    with consistent spread. The poly-transformed model often shows improvement in this regard.
     """
 )
 
