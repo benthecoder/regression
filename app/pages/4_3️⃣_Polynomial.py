@@ -52,7 +52,7 @@ st.dataframe(data.head())
 
 st.markdown(
     """
-    We cam see above a few sample of our data, lets take a closer look with some visualizations.
+    We can see above a few sample of our data, lets take a closer look with some visualizations.
     """
 )
 
@@ -100,7 +100,7 @@ y_pred_poly = model_poly.predict(X_poly)
 
 
 # Plot before and after transformation side by side
-st.write("## Regression Plots: Before and After Poly Transformation")
+st.write("## Regression Plots: Before and After Polynomial Transformation")
 col1, col2 = st.columns(2)
 
 with col1:
