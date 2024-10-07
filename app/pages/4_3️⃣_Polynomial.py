@@ -52,7 +52,7 @@ st.dataframe(data.head())
 
 st.markdown(
     """
-    We can see above a few sample of our data, lets take a closer look with some visualizations.
+    We can see above a few samples of our data, let's take a closer look with some visualizations.
     """
 )
 
