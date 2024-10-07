@@ -29,3 +29,14 @@ if selected_dataset == "gdp_per_capita.csv":
     df = pd.read_csv(f"datasets/{selected_dataset}")
     st.write(df.head())
     st.line_chart(df, x="Year", y="GDP_per_capita")
+
+if selected_dataset == "eco_fuel_consumption.csv":
+    st.write(
+        """
+        ## 
+        This synthetic dataset contains the EcoFuel consumption of a county's population."""
+    )
+
+    df = pd.read_csv(f"datasets/{selected_dataset}")
+    st.write(df.head())
+    st.line_chart(df, x="population", y="ecofuel_consumption")
