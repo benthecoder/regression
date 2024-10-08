@@ -30,6 +30,8 @@ st.markdown(
     In this guide, we'll explore how log transformation can improve our regression model using GDP per capita data. 
     We'll compare a standard linear regression with a log-transformed model to demonstrate the benefits and 
     interpretations of this technique.
+
+    For our analysis, we've chosen to apply the log transformation to the response variable (GDP per capita) due to its right-skewed distribution and the expectation of exponential growth over time. This transformation aims to linearize the relationship between GDP per capita and time, potentially addressing issues of non-linearity and heteroscedasticity.
     """
 )
 
@@ -120,7 +122,6 @@ with col2:
             "log(GDP per capita)",
         )
     )
-
 st.write("## Model Performance and Interpretation")
 col1, col2 = st.columns(2)
 
@@ -128,6 +129,7 @@ with col1:
     st.write("### Standard Linear Regression")
     st.write(f"R-squared: {r2_score(y, y_pred):.4f}")
     st.write(f"Mean Squared Error: {mean_squared_error(y, y_pred):.4f}")
+    st.write(f"Mean Squared Total: {np.var(y):.4f}")
 
     st.markdown(
         """
@@ -137,6 +139,8 @@ with col1:
     Coefficient for Year: {:.2f}
     
     This means that, on average, GDP per capita increases by ${:.2f} each year.
+
+    Note that the MSE is quite large compared to the MST, indicating poor model fit.
     """.format(model.params["Year"], model.params["Year"])
     )
 
@@ -148,6 +152,7 @@ with col2:
     st.write(
         f"Mean Squared Error: {mean_squared_error(data['log_GDP_per_capita'], model_log.predict(X)):.4f}"
     )
+    st.write(f"Mean Squared Total: {np.var(data['log_GDP_per_capita']):.4f}")
 
     year_coef = model_log.params["Year"]
     percentage_change = (np.exp(year_coef) - 1) * 100
@@ -160,8 +165,11 @@ with col2:
     Coefficient for Year: {:.4f}
     
     This means that, on average, GDP per capita increases by {:.4f}% each year.
+
+    The MSE is much smaller after log transformation, but this is partly due to the change in scale of the response variable.
     """.format(year_coef, percentage_change)
     )
+
 
 st.write("---")
 
@@ -193,9 +201,9 @@ st.markdown(
 
     - **Standard Model**: Clear pattern with larger residuals in recent years, indicating heteroscedasticity.
 
-    - **Log-transformed Model**: More consistent spread, but some patterns remain in the later years.
+    - **Log-transformed Model**: More consistent spread, but some patterns remain in the later years, particularly towards the end of the time series.
 
-    The log-transformed model improves homoscedasticity, but doesn't fully capture all underlying data structures.
+    While the log-transformed model improves homoscedasticity, it doesn't fully resolve all issues. The persistent pattern in the residuals suggests that there might be additional underlying structures or trends in the data that are not captured by the simple linear model.
     """
 )
 
@@ -216,9 +224,9 @@ st.markdown(
 
     - **Standard Model**: Significant deviations from the diagonal, especially at the tails. Residuals are not normally distributed.
 
-    - **Log-transformed Model**: Closer to the diagonal, especially in the middle. Some deviations remain at the tails.
+    - **Log-transformed Model**: Closer to the diagonal, especially in the middle. However, there are still deviations at the tails, particularly showing light-tailed behavior (points falling below the line at the right end).
 
-    The log-transformed model improves residual normality, but some patterns persist, suggesting potential extreme values or unexplained trends in the data.
+    While the log-transformed model improves residual normality, it doesn't completely resolve the issues. The light-tailed behavior in the Q-Q plot suggests that there might be fewer extreme values in the residuals than expected under a normal distribution.
     """
 )
 
@@ -227,39 +235,45 @@ st.markdown(
     """
     ## Conclusion
 
-    Our analysis demonstrates how log transformation can significantly improve linear regression models for GDP per capita data:
+    Our analysis demonstrates how log transformation can improve linear regression models for GDP per capita data, but it's important to note that it doesn't completely resolve all issues:
 
-    1. **Improved homoscedasticity in residuals**: The log-transformed model shows a more consistent spread of residuals across the years, addressing the heteroscedasticity observed in the standard model.
+    1. **Partial improvement in homoscedasticity**: While the log-transformed model shows a more consistent spread of residuals, patterns still remain, especially in recent years.
     
-    2. **Better normality of residuals**: The Q-Q plot for the log-transformed model adheres more closely to the diagonal line, indicating a distribution closer to normal, especially in the middle range.
+    2. **Improved but imperfect normality of residuals**: The Q-Q plot for the log-transformed model is closer to the diagonal line, but deviations persist, particularly showing light-tailed behavior.
     
     3. **Higher R-squared value**: The log-transformed model explains a larger proportion of the variance in the data, increasing from {:.4f} to {:.4f}.
+
+    4. **Change in MSE scale**: The MSE decreased significantly after log transformation (from {:.4f} to {:.4f}), but this is largely due to the change in scale of the response variable. The ratio of MSE to MST improved from {:.4f} to {:.4f}, indicating better relative fit.
 
     Key benefits of log transformation for economic data:
     1. **Reveals exponential growth patterns**: By linearizing exponential trends, log transformation helps uncover and model the compound growth often present in economic data.
     
     2. **Allows interpretation of coefficients as percentage changes**: In our log-transformed model, we can interpret that GDP per capita grows by approximately {:.2f}% per year, providing a more intuitive understanding of economic growth.
     
-    3. **Helps stabilize variance in residuals**: This addresses the issue of heteroscedasticity, which violates a key assumption of OLS regression.
+    3. **Partially addresses heteroscedasticity**: While not perfect, it helps stabilize variance in the residuals to some extent.
     
-    4. **Improves adherence to linear regression assumptions**: By addressing non-linearity, non-normality, and heteroscedasticity, log transformation helps meet the assumptions required for valid inference in linear regression.
+    4. **Improves adherence to linear regression assumptions**: The transformation partially addresses non-linearity, non-normality, and heteroscedasticity, but doesn't fully resolve these issues.
 
     Limitations and areas for further investigation:
-    - Some patterns in residuals and Q-Q plot deviations remain, particularly in the tails, suggesting that log transformation alone may not capture all complexities in the data.
-    - MSE values are not directly comparable between models due to the change in scale. Alternative metrics like MAPE (Mean Absolute Percentage Error) could be considered for model comparison.
+    - Persistent patterns in residuals and Q-Q plot deviations suggest that log transformation alone doesn't capture all complexities in the data.
     - The simple time series model may not account for other factors influencing GDP per capita, such as economic cycles, technological advancements, or global events.
 
-    While log transformation significantly improves the model, it's not a perfect solution. Further analysis could include:
+    While log transformation improves the model, it's not a complete solution. Further analysis could include:
     1. Exploring additional variables that might explain GDP per capita growth.
     2. Investigating non-linear trends that persist after log transformation.
     3. Considering more advanced time series techniques, such as ARIMA models or polynomial regression.
     4. Analyzing residuals for autocorrelation, which is common in time series data.
     5. Examining the impact of influential observations or outliers on the model.
 
-    In conclusion, this analysis demonstrates the power of log transformation in improving linear regression models for economic data. It highlights the importance of carefully considering data characteristics and model assumptions in statistical analysis. While the log-transformed model provides valuable insights into GDP per capita growth, it also reveals the complexity of economic data and the need for ongoing refinement in modeling approaches.
+    In conclusion, this analysis demonstrates both the benefits and limitations of log transformation in improving linear regression models for economic data. It highlights the importance of carefully considering data characteristics and model assumptions in statistical analysis. While the log-transformed model provides some improvements and valuable insights into GDP per capita growth, it also reveals the complexity of economic data and the need for ongoing refinement in modeling approaches.
     """.format(
         r2_score(y, y_pred),
         r2_score(data["log_GDP_per_capita"], model_log.predict(X)),
+        mean_squared_error(y, y_pred),
+        mean_squared_error(data["log_GDP_per_capita"], model_log.predict(X)),
+        mean_squared_error(y, y_pred) / np.var(y),
+        mean_squared_error(data["log_GDP_per_capita"], model_log.predict(X))
+        / np.var(data["log_GDP_per_capita"]),
         percentage_change,
     )
 )
