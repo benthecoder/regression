@@ -40,3 +40,25 @@ if selected_dataset == "eco_fuel_consumption.csv":
     df = pd.read_csv(f"datasets/{selected_dataset}")
     st.write(df.head())
     st.line_chart(df, x="population", y="ecofuel_consumption")
+
+if selected_dataset == "reactions.csv":
+    st.write(
+        """
+        ## 
+        This synthetic dataset contains the Reactions when a concentration is added to an experiment"""
+    )
+
+    df = pd.read_csv(f"datasets/{selected_dataset}")
+    st.write(df.head())
+    st.line_chart(df, x="concentration", y="reaction")
+
+if selected_dataset == "infmort.csv":
+    st.write(
+        """
+        ## 
+        TODO"""
+    )
+
+    df = pd.read_csv(f"datasets/{selected_dataset}")
+    st.write(df.head())
+    st.line_chart(df, x="mortality", y="gdp")
