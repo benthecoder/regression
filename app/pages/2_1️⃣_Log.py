@@ -191,9 +191,14 @@ with col1:
     )
 
 with col2:
+    # Calculate residuals in the original space
+    log_residuals = y - np.exp(y_pred_log)
     st.pyplot(
         plot_residuals(
-            data["Year"], y - y_pred_log, "Residuals: Log-transformed Model", "Year"
+            data["Year"],
+            log_residuals,
+            "Residuals: Log-transformed Model",
+            "Year",
         )
     )
 
