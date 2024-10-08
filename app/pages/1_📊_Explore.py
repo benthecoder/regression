@@ -27,6 +27,7 @@ if selected_dataset == "gdp_per_capita.csv":
     )
 
     df = pd.read_csv(f"datasets/{selected_dataset}")
+    df["Year"] = df["Year"].astype(str)
     st.write(df.head())
     st.line_chart(df, x="Year", y="GDP_per_capita")
 
