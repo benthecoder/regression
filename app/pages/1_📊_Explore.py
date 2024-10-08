@@ -55,10 +55,13 @@ if selected_dataset == "reactions.csv":
 if selected_dataset == "infmort.csv":
     st.write(
         """
-        ## 
-        TODO"""
+        ## Infant mortality and GDP per capita
+
+        Source: [LearnR Walkthroughs](https://github.com/jgscott/learnR/blob/master/README.md#:~:text=Infant%20mortality%20and%20GDP)
+        
+        This dataset contains the GDP per capita in U.S. dollars from 1960-2023 across 207 countries."""
     )
 
-    df = pd.read_csv(f"datasets/{selected_dataset}")
+    df = pd.read_csv(f"datasets/{selected_dataset}").dropna()
     st.write(df.head())
     st.line_chart(df, x="mortality", y="gdp")
