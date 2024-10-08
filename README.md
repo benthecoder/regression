@@ -15,10 +15,11 @@ Article link: <>
 
 Team members:
 
+
+- [Adrian Lam Lorn Hin](https://www.linkedin.com/in/adrianlhlam/)
 - [Benedict Neo](https://www.linkedin.com/in/benedictneo/)
-- Adrian Lam Lorn Hin
-- Nicholas Barsi-Rhyne
-- Rebekah Zhou
+- [Nicholas Barsi-Rhyne](https://www.linkedin.com/in/nicholas-barsi-rhyne-64a006204/)
+- [Rebekah Zhou](https://www.linkedin.com/in/rebekahzhou/)
 
 ## setup
 
