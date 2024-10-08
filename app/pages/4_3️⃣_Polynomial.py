@@ -90,10 +90,10 @@ y = data["reaction"]
 model = sm.OLS(y, X).fit()
 y_pred = model.predict(X)
 
-model_poly = LinearRegression()
+# model_poly = LinearRegression()
 poly = PolynomialFeatures(degree=4)
 X_poly = poly.fit_transform(data["concentration"].values.reshape(-1, 1))
-model_poly.fit(X_poly, y)
+model_poly = sm.OLS(y, X_poly).fit()
 X_range = np.linspace(0, 5, 100).reshape(-1, 1)
 X_range_poly = poly.transform(X_range)
 y_pred_poly = model_poly.predict(X_poly)
@@ -138,7 +138,7 @@ with col1:
     st.markdown(
         """
     #### Interpretation:
-    In the standard model, the coefficient for Year represents the average increase in GDP per capita for each year.
+    In the standard model, the coefficient for concentration represents the average increase in reaction.
     
     Coefficient for Concentration: {:.2f}
     
@@ -155,13 +155,13 @@ with col2:
         f"Mean Squared Error: {mean_squared_error(y, y_pred_poly):.4f}"
     )
 
-    coefficients = model_poly.coef_
+    coefficients = model_poly.params
     powers = poly.powers_
 
     st.markdown(
         r"""
     #### Interpretation:
-    In the poly-transformed model, the coefficient are a little harder to interprate but we can try.
+    In the poly-transformed model, the coefficients are a little harder to interpret but we can try.
     
     $\beta_0={:.4f}$<br>
     $\beta_1={:.4f}$<br>
@@ -169,14 +169,14 @@ with col2:
     $\beta_3={:.4f}$<br>
     $\beta_4={:.4f}$<br>
     
-    However this is hard to interperate because in our model we have..
+    However this is hard to interpret because in our model we have..
 
     $X_i^1$<br>
     $X_i^2$<br>
     $X_i^3$<br>
     $X_i^4$<br>
     
-    In our training data.
+    in our training data.
     """.format(coefficients[0],coefficients[1],coefficients[2],coefficients[3],coefficients[4]),
     unsafe_allow_html=True
     )
@@ -330,4 +330,21 @@ st.markdown(
     By using Legendre polynomials, you improve the stability and interpretability of your polynomial regression model, particularly when dealing with higher degrees.
     """.format(vif_L_data['VIF'][0],vif_L_data['VIF'][1],vif_L_data['VIF'][2],vif_L_data['VIF'][3],vif_L_data['VIF'][4]),
     unsafe_allow_html=True
+)
+st.write("## Appendix: Detailed Model Summaries")
+col1, col2 = st.columns(2)
+
+with col1:
+    st.write("### Standard Model Summary")
+    st.text(model.summary().as_text())
+
+with col2:
+    st.write("### Exponentially Transformed Model Summary")
+    st.text(model_poly.summary().as_text())
+
+st.markdown(
+    """
+    These summaries provide detailed statistical information about both models, including coefficient estimates, 
+    standard errors, t-statistics, and p-values.
+    """
 )
