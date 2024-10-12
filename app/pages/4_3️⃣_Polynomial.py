@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
-from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.metrics import r2_score, root_mean_squared_error
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from statsmodels.stats.outliers_influence import variance_inflation_factor
@@ -19,7 +19,7 @@ st.set_page_config(
 st.write("# Polynomial Transformation")
 
 st.markdown(
-    """
+    r"""
     
     ## Introduction
     
@@ -31,6 +31,12 @@ st.markdown(
     4. **Improved model accuracy**: By adding polynomial terms, you can potentially improve the predictive power of your model.
 
     In this guide, we'll explore how polynomial transformation can enhance our regression model using a hypothetical dose-response dataset. We'll compare a standard linear regression model with a higher-degree polynomial regression model to demonstrate the advantages of capturing non-linear trends and making better predictions.
+
+    **Note:** In polynomial regression, we often transform X from one dimension to two or more. For most of this notebook, 
+    the polynomial transformation is applied as follows. This means that the transformation was applied to our 
+    X term, taking it from one dimension to multiple dimensions.
+     
+    $\hat{y}=\hat{\beta_0}+\hat{\beta_1}X_1+\hat{\beta_2}X^2_1+\hat{\beta_3}X^3_1+\hat{\beta_4}X^4_1$
     """
 )
 
@@ -97,7 +103,7 @@ model_poly = sm.OLS(y, X_poly).fit()
 X_range = np.linspace(0, 5, 100).reshape(-1, 1)
 X_range_poly = poly.transform(X_range)
 y_pred_poly = model_poly.predict(X_poly)
-
+mst = np.mean((y - np.mean(y))**2)
 
 # Plot before and after transformation side by side
 st.write("## Regression Plots: Before and After Polynomial Transformation")
@@ -133,7 +139,7 @@ col1, col2 = st.columns(2)
 with col1:
     st.write("### Standard Linear Regression")
     st.write(f"R-squared: {r2_score(y, y_pred):.4f}")
-    st.write(f"Mean Squared Error: {mean_squared_error(y, y_pred):.4f}")
+    st.write(f"Mean Squared Error: {root_mean_squared_error(y, y_pred)**2:.4f}")
 
     st.markdown(
         """
@@ -152,7 +158,7 @@ with col2:
         f"R-squared: {r2_score(y, y_pred_poly):.4f}"
     )
     st.write(
-        f"Mean Squared Error: {mean_squared_error(y, y_pred_poly):.4f}"
+        f"Mean Squared Error: {root_mean_squared_error(y, y_pred_poly)**2:.4f}"
     )
 
     coefficients = model_poly.params
@@ -179,7 +185,75 @@ with col2:
     in our training data.
     """.format(coefficients[0],coefficients[1],coefficients[2],coefficients[3],coefficients[4]),
     unsafe_allow_html=True
+
     )
+st.write("## Model Performance and Interpretation")
+st.markdown(
+    r"""
+For this data our $MST={:.4f}$.
+
+In linear regression, the MSE is typically smaller than the MST, 
+indicating that the model explains some of the data’s variance but 
+not all, especially if the true relationship is nonlinear. In polynomial 
+regression, the MSE tends to be much smaller than in linear models, as 
+the polynomial can capture more complexity. However, this may lead to 
+overfitting if the degree is too high. MST remains constant across models, 
+representing the total variance in the actual data.
+
+We can consider ourselves fortunate that we know this interaction should 
+be modeled using a 4th-degree polynomial. If, for instance, we did not 
+know which degree to choose, it could significantly affect our predictions 
+and lead to overfitting or memorization of the data if we select the wrong degree.
+
+To help us visualize this lets look at two extreme cases.
+""".format(mst),
+unsafe_allow_html=True
+)
+
+poly_2 = PolynomialFeatures(degree=2)
+X_poly_2 = poly_2.fit_transform(data["concentration"].values.reshape(-1, 1))
+model_poly = sm.OLS(y, X_poly_2).fit()
+X_range = np.linspace(0, 5, 100).reshape(-1, 1)
+X_range_poly = poly.transform(X_range)
+y_pred_poly_2 = model_poly.predict(X_poly_2)
+
+poly_15 = PolynomialFeatures(degree=15)
+X_poly_15 = poly_15.fit_transform(data["concentration"].values.reshape(-1, 1))
+model_poly = sm.OLS(y, X_poly_15).fit()
+X_range = np.linspace(0, 5, 100).reshape(-1, 1)
+X_range_poly = poly.transform(X_range)
+y_pred_poly_15 = model_poly.predict(X_poly_15)
+
+col1, col2 = st.columns(2)
+with col1:
+    st.pyplot(
+        plot_regression(
+            data["concentration"],
+            y,
+            y_pred_poly_2,
+            "2nd Degree Regression",
+            "Concentraction",
+            "Reaction",
+        )
+    )
+
+with col2:
+    st.pyplot(
+        plot_regression(
+            data["concentration"],
+            y,
+            y_pred_poly_15,
+            "15th Degree Regression",
+            "Concentraction",
+            "Reaction",
+        )
+    )
+st.markdown(
+    """
+If we look at the two graphs, they might appear to "somewhat" fit the data, but both graphs have issues. For the 2nd-degree polynomial, if we had more data, we would see that the true relationship does not follow a parabolic shape. We can even begin to see this deviation at the edges. The 15th-degree polynomial has even bigger issues at the edges of the graph, and while it "fits" more of the data points, this model would not generalize well to new, unseen data.
+"""
+)
+
 
 st.markdown(
     """
