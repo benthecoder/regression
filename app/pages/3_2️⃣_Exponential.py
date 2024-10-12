@@ -124,22 +124,38 @@ with col1:
     st.write("### Standard Linear Regression")
     st.write(f"R-squared: {r2_score(y, y_pred):.4f}")
     st.write(f"Mean Squared Error: {mean_squared_error(y, y_pred):.4f}")
+    st.write(f"Mean Squared Total: {np.var(df['ecofuel_consumption'], ddof=1):.4f}")
+    
+    st.markdown(
+        """
+    #### Interpretation:
+    In the standard model, the coefficient for Population represents the average increase in millions of gallons of EcoFuel consumption per 1 million people.
+    
+    Coefficient for Population: {:.4f}
+    
+    This means that, on average, EcoFuel consumption (in millions of gallons) increases by {:.4f} per 1 million people.
+    """.format(model.params["population"], model.params["population"])
+    )
 
 
 with col2:
     st.write("### Exponentially Transformed Regression")
     st.write(f"R-squared: {r2_score(exp_y, exp_y_pred):.4f}")
     st.write(f"Mean Squared Error: {mean_squared_error(exp_y, exp_y_pred):.4f}")
+    st.write(f"Mean Squared Total: {np.var(df['exp_ecofuel_consumption'], ddof=1):.4f}")
 
-st.markdown(
+    coef = exp_model.params["population"]
+    percentage_change = (np.exp(coef) - 1) * 100
+
+    st.markdown(
         """
-    #### Interpretation:
-    In both models, the coefficient for Population represents the average increase in millions of gallons of EcoFuel consumption per 1 million people.
-    
-    Coefficient for Population: {:.4f}
-    
-    This means that, on average, EcoFuel consumption (in millions of gallons) increases by {:.4f} per 1 million people.
-    """.format(model.params["population"], model.params["population"])
+        #### Interpretation:
+        In the transformed model, the coefficient for Population represents the approximate percentage change in EcoFuel consumption for each additional 1 million people.
+        
+        Coefficient for Population: {:.4f}
+        
+        This means that, on average, for each 1 million increase in population, EcoFuel consumption (in millions of gallons) increases by approximately {} percent.
+        """.format(coef, int(percentage_change))
     )
 
 st.markdown(
