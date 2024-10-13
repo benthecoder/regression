@@ -34,9 +34,9 @@ def apply_transformations(df, x_col, y_col):
     y = df[y_col].values
     
     # LOG transformation
-    X_log = np.log(X)
-    model_log = sm.OLS(y, sm.add_constant(X_log)).fit()
-    y_pred_log = model_log.predict(sm.add_constant(X_log))
+    y_log = np.log(y)
+    model_log = sm.OLS(y_log, sm.add_constant(X)).fit()
+    y_pred_log = model_log.predict(sm.add_constant(X))
     
     # EXPONENTIAL transformation
     y_exp = np.log(y)
