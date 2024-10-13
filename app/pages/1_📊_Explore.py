@@ -43,8 +43,11 @@ def apply_transformations(df, x_col, y_col):
     model_exp = sm.OLS(y_exp, sm.add_constant(X)).fit()
     y_pred_exp = model_exp.predict(sm.add_constant(X))
     
-    # POLYNOMIAL transformation
-    poly = PolynomialFeatures(degree=3)
+    # POLYNOMIAL transformation 
+    if df.columns[0] == 'country':
+        poly = PolynomialFeatures(degree=1)
+    else: 
+        poly = PolynomialFeatures(degree=2)
     X_poly = poly.fit_transform(X)
     model_poly = LinearRegression().fit(X_poly, y)
     y_pred_poly = model_poly.predict(X_poly)
@@ -133,3 +136,8 @@ if selected_dataset:
             This dataset contains the GDP per capita in U.S. dollars from 1960-2023 across 207 countries."""
         )
         plot_transformations(df, "mortality", "gdp")
+        st.write(
+            """
+            Note: The polynomial regression is unable to fit with this data when degree is higher than 1, so the fit is linear.
+            """
+        )
