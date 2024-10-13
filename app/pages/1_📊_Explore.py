@@ -39,9 +39,9 @@ def apply_transformations(df, x_col, y_col):
     y_pred_log = model_log.predict(sm.add_constant(X))
     
     # EXPONENTIAL transformation
-    y_exp = np.log(y)
+    y_exp = np.exp(y)
     model_exp = sm.OLS(y_exp, sm.add_constant(X)).fit()
-    y_pred_exp = np.exp(model_exp.predict(sm.add_constant(X)))
+    y_pred_exp = model_exp.predict(sm.add_constant(X))
     
     # POLYNOMIAL transformation
     poly = PolynomialFeatures(degree=3)
@@ -55,27 +55,27 @@ def apply_transformations(df, x_col, y_col):
     model_power = sm.OLS(y_power, sm.add_constant(X_power)).fit()
     y_pred_power = np.exp(model_power.predict(sm.add_constant(X_power)))
     
-    return X_log, y_pred_log, y_exp, y_pred_exp, y_pred_poly, X_power, y_power, y_pred_power
+    return y_log, y_pred_log, y_exp, y_pred_exp, y_pred_poly, X_power, y_power, y_pred_power
 
 def plot_transformations(df, x_col, y_col):
     df = preprocess_data(df, x_col, y_col)
     
     try:
-        X_log, y_pred_log, y_exp, y_pred_exp, y_pred_poly, X_power, y_power, y_pred_power = apply_transformations(df, x_col, y_col)
+        y_log, y_pred_log, y_exp, y_pred_exp, y_pred_poly, X_power, y_power, y_pred_power = apply_transformations(df, x_col, y_col)
         
         fig = make_subplots(rows=2, cols=2, subplot_titles=("LOG", "EXPONENTIAL", "POLYNOMIAL", "POWER LAW"))
         
         # LOG
-        fig.add_trace(go.Scatter(x=np.log(df[x_col]), y=df[y_col], mode='markers', name='Data'), row=1, col=1)
-        fig.add_trace(go.Scatter(x=np.log(df[x_col]), y=y_pred_log, mode='lines', name='LOG Fit'), row=1, col=1)
-        fig.update_xaxes(title_text=f"log({x_col})", row=1, col=1)
-        fig.update_yaxes(title_text=y_col, row=1, col=1)
+        fig.add_trace(go.Scatter(x=df[x_col], y=y_log, mode='markers', name='Data'), row=1, col=1)
+        fig.add_trace(go.Scatter(x=df[x_col], y=y_pred_log, mode='lines', name='LOG Fit'), row=1, col=1)
+        fig.update_xaxes(title_text=f"{x_col}", row=1, col=1)
+        fig.update_yaxes(title_text=f"log({y_col})", row=1, col=1)
         
         # EXPONENTIAL
-        fig.add_trace(go.Scatter(x=df[x_col], y=np.log(df[y_col]), mode='markers', name='Data'), row=1, col=2)
-        fig.add_trace(go.Scatter(x=df[x_col], y=np.log(y_pred_exp), mode='lines', name='EXPONENTIAL Fit'), row=1, col=2)
+        fig.add_trace(go.Scatter(x=df[x_col], y=y_exp, mode='markers', name='Data'), row=1, col=2)
+        fig.add_trace(go.Scatter(x=df[x_col], y=y_pred_exp, mode='lines', name='EXPONENTIAL Fit'), row=1, col=2)
         fig.update_xaxes(title_text=x_col, row=1, col=2)
-        fig.update_yaxes(title_text=f"log({y_col})", row=1, col=2)
+        fig.update_yaxes(title_text=f"exp({y_col})", row=1, col=2)
         
         # POLYNOMIAL
         fig.add_trace(go.Scatter(x=df[x_col], y=df[y_col], mode='markers', name='Data'), row=2, col=1)
@@ -121,7 +121,7 @@ if selected_dataset:
         st.write(
             """
             ## Reactions
-            This synthetic dataset contains the Reactions when a concentration is added to an experiment"""
+            This synthetic dataset contains the Reactions when a concentration is added to an experiment."""
         )
         plot_transformations(df, "concentration", "reaction")
         
