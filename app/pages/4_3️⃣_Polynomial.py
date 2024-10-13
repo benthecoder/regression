@@ -114,7 +114,7 @@ with col1:
             y,
             y_pred,
             "Standard Linear Regression",
-            "Concentraction",
+            "concentration",
             "Reaction",
         )
     )
@@ -126,7 +126,7 @@ with col2:
             y,
             y_pred_poly,
             "Poly-transformed Regression",
-            "Concentraction",
+            "concentration",
             "Reaction",
         )
     )
@@ -226,7 +226,7 @@ with col1:
             y,
             y_pred_poly_2,
             "2nd Degree Regression",
-            "Concentraction",
+            "concentration",
             "Reaction",
         )
     )
@@ -238,7 +238,7 @@ with col2:
             y,
             y_pred_poly_15,
             "15th Degree Regression",
-            "Concentraction",
+            "concentration",
             "Reaction",
         )
     )
