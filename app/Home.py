@@ -20,6 +20,8 @@ st.markdown(
     - Power Law
     - Exponential
 
+    Click on the Explore page to see the effects of different transformations on different datasets.
+    
     Click on the sidebar to select the transformation you want to apply!
 
 

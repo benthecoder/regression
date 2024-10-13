@@ -139,7 +139,7 @@ with col1:
 
 with col2:
     st.write("### Power Law Transformed Regression")
-    st.latex(f"R^2: {r2_score(data['log_gdp'], model_log.predict(X_log)):.4f}")
+    st.write(f"R-squared: {r2_score(data['log_gdp'], model_log.predict(X_log)):.4f}")
     st.write(f"Mean Squared Error: {mean_squared_error(data['log_gdp'], model_log.predict(X_log)):.4f}")
 
     x_coef = model_log.params["log_mortality"]
@@ -150,11 +150,11 @@ with col2:
     In the power law transformed model, the coefficient for log(infant mortality) represents the elasticity of GDP per capita with respect to infant mortality.
     """
     )
-    st.latex(f"\\text{{Coefficient for }} \\log(\\text{{infant mortality}}): {x_coef:.4f}")
+    st.write(f"Coefficient for log(infant mortality): {x_coef:.4f}")
     
     st.markdown(
         f"""
-    This means that GDP per capita is proportional to (infant mortality)$^{{{x_coef:.4f}}}$. In other words, when infant mortality increases by 1%, GDP per capita changes by approximately {x_coef * 100:.2f}%.
+    This means that GDP per capita is proportional to infant mortality {x_coef:.4f}. In other words, when infant mortality increases by 1%, GDP per capita changes by approximately {x_coef * 100:.2f}%.
     """
     )
 

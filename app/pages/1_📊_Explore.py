@@ -111,6 +111,11 @@ if selected_dataset:
             This dataset contains the GDP per capita of USA from 1960-2023."""
         )
         plot_transformations(df, "Year", "GDP_per_capita")
+        st.write(
+            """
+            Note: The exponential regression doesn't work because exponentiating values in the tens of thousands is literally too big for the computer to process.
+            """
+        )
         
     elif selected_dataset == "eco_fuel_consumption.csv":
         st.write(
