@@ -129,7 +129,7 @@ with col1:
     st.write("### Standard Linear Regression")
     st.write(f"R-squared: {r2_score(y, y_pred):.4f}")
     st.write(f"Mean Squared Error: {mean_squared_error(y, y_pred):.4f}")
-    st.write(f"Mean Squared Total: {np.var(y):.4f}")
+    st.write(f"Mean Squared Total: {np.var(y, ddof=1):.4f}")
 
     st.markdown(
         """
@@ -152,7 +152,7 @@ with col2:
     st.write(
         f"Mean Squared Error: {mean_squared_error(data['log_GDP_per_capita'], model_log.predict(X)):.4f}"
     )
-    st.write(f"Mean Squared Total: {np.var(data['log_GDP_per_capita']):.4f}")
+    st.write(f"Mean Squared Total: {np.var(data['log_GDP_per_capita'], ddof=1):.4f}")
 
     year_coef = model_log.params["Year"]
     percentage_change = (np.exp(year_coef) - 1) * 100

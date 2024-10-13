@@ -124,17 +124,12 @@ with col1:
     st.write("### Standard Linear Regression")
     st.write(f"R-squared: {r2_score(y, y_pred):.4f}")
     st.write(f"Mean Squared Error: {mean_squared_error(y, y_pred):.4f}")
-
-
-with col2:
-    st.write("### Exponentially Transformed Regression")
-    st.write(f"R-squared: {r2_score(exp_y, exp_y_pred):.4f}")
-    st.write(f"Mean Squared Error: {mean_squared_error(exp_y, exp_y_pred):.4f}")
-
-st.markdown(
+    st.write(f"Mean Squared Total: {np.var(df['ecofuel_consumption'], ddof=1):.4f}")
+    
+    st.markdown(
         """
     #### Interpretation:
-    In both models, the coefficient for Population represents the average increase in millions of gallons of EcoFuel consumption per 1 million people.
+    In the standard model, the coefficient for Population represents the average increase in millions of gallons of EcoFuel consumption per 1 million people.
     
     Coefficient for Population: {:.4f}
     
@@ -142,16 +137,34 @@ st.markdown(
     """.format(model.params["population"], model.params["population"])
     )
 
+
+with col2:
+    st.write("### Exponentially Transformed Regression")
+    st.write(f"R-squared: {r2_score(exp_y, exp_y_pred):.4f}")
+    st.write(f"Mean Squared Error: {mean_squared_error(exp_y, exp_y_pred):.4f}")
+    st.write(f"Mean Squared Total: {np.var(df['exp_ecofuel_consumption'], ddof=1):.4f}")
+
+    coef = exp_model.params["population"]
+    percentage_change = (np.exp(coef) - 1) * 100
+
+    st.markdown(
+        """
+        #### Interpretation:
+        In the transformed model, the coefficient for Population represents the approximate percentage change in EcoFuel consumption for each additional 1 million people.
+        
+        Coefficient for Population: {:.4f}
+        
+        This means that, on average, for each 1 million increase in population, EcoFuel consumption (in millions of gallons) increases by approximately {} percent.
+        """.format(coef, int(percentage_change))
+    )
+
 st.markdown(
     """
-    ### Why exponential transformation is better:
-The exponentially transformed model often provides a better fit for data that follows an exponential growth or decay pattern because:
+    ### Comparing the Two Models:
 
-1. It captures rapid changes in the data more effectively than a linear model, making it suitable for modeling growth or decay over time.
-2. It transforms multiplicative relationships into additive ones, simplifying the interpretation of interaction effects.
-3. It can address issues of heteroscedasticity by stabilizing the variance in the residuals.
+The exponentially transformed model explains a larger proportion of the variance in the data, with an R-squared of 0.9691, compared to the standard linear regression's R-squared of 0.9050. This indicates that the exponential model provides a significantly better fit for the data.
 
-As shown by the metrics, the exponentially transformed model explains a larger proportion of the variance in the data (R-squared = 0.9691) compared to the standard linear regression (R-squared = 0.9050), indicating a significantly better fit. However, it is important to consider that the exponentially transformed model had a higher Mean Squared Error (0.4325) compared to the linear model (0.0327), suggesting potential sensitivity to extreme values or outliers in the dataset.
+However, the exponentially transformed model has a higher Mean Squared Error (0.4325) compared to the linear model (0.0327). This higher MSE should be interpreted with caution, as it reflects the transformed scale of the dependent variable. The higher MSE in the exponential model does not indicate poorer performance; rather, it results from the model’s focus on capturing multiplicative relationships and explaining more of the variance in the data.
 
 """
 )
@@ -174,8 +187,13 @@ with col2:
 
 st.markdown(
     """
-    The residual plots help us assess the homoscedasticity assumption. Ideally, we want to see a random scatter of points 
-    with consistent spread. The exponentially transformed model definitely shows a more random scatter of points, but homoscedasticity remains an issue. We may want to consider removing outliers.
+    Residual plots help assess homoscedasticity (constant variance of residuals):
+
+    - **Standard Model**: Clear pattern with increasing residual spread as population increases, indicating heteroscedasticity and suggesting that the model may not be capturing the relationship effectively, especially at higher population levels.
+
+    - **Exponentially Transformed Model**: Shows a more random scatter of residuals, indicating an improvement in homoscedasticity. However, some residual spread still increases with population, suggesting that influential points may be affecting the model's performance.
+
+    While the exponentially transformed model better addresses homoscedasticity, it doesn't fully resolve all issues. The increasing spread of residuals indicates that there might be influential points or trends that the model isn’t capturing effectively. Addressing these points could further improve the model’s fit.
     """
 )
 
@@ -190,8 +208,13 @@ with col2:
 
 st.markdown(
     """
-    Q-Q plots help us assess the normality of residuals. Points closer to the diagonal line indicate a better fit to 
-    the normal distribution. The exponentially transformed model often shows improvement in normality of residuals with the exception of the points at the edges of our x range.
+    Q-Q plots help assess the normality of residuals. Points closer to the diagonal line indicate better normality.
+
+    - **Standard Model**: Significant deviations from the diagonal, especially in the tails. This indicates that the residuals are not normally distributed, particularly at the extreme values, where they diverge considerably from the expected normal distribution.
+
+    - **Exponentially Transformed Model**: The points are closer to the diagonal line in the middle, suggesting better normality in the central part of the distribution. However, deviations from normality remain in the tails, with larger positive residuals indicating heavy-tailed behavior at the upper end (points falling above the line).
+
+    While the exponentially transformed model improves residual normality, especially in the middle range, it doesn't fully resolve the issues at the extremes. The heavy-tailed behavior in the Q-Q plot suggests that there might be more extreme positive residuals than expected under a normal distribution.
     """
 )
 
@@ -199,13 +222,13 @@ st.markdown(
     """
     ## Conclusion
 
-    In this analysis, we've seen how exponential transformation can improve the fit of a regression model:
+    In this analysis, we demonstrated how exponential transformation can improve the performance of a regression model:
 
-    1. The exponentially transformed model captured the rapid changes in the data more effectively, particularly in cases of exponential growth patterns.
-    2. The R-squared value improved significantly from 0.9050 (standard linear regression) to 0.9691 (exponentially transformed model), indicating a better overall fit to the data.
-    3. The Q-Q plot for the exponentially transformed model showed residuals that were closer to the diagonal line, suggesting a better approximation to a normal distribution.
+    1. The exponentially transformed model captured the changes in the data more effectively, particularly for exponential growth patterns, leading to a more accurate representation of the relationship between population and EcoFuel consumption.
+    2. The R-squared value improved significantly, from 0.9050 in the standard linear regression to 0.9691 in the exponentially transformed model, indicating a much better fit to the data.
+    3. The Q-Q plot for the exponentially transformed model showed residuals closer to the diagonal line, suggesting a better approximation to normality, especially in the central part of the distribution. However, deviations in the tails indicate the need for further refinement.
 
-    Exponential transformation is often useful when dealing with data that changes exponentially over time, such as population growth or decay of a resource. It helps stabilize the variance and capture the multiplicative effects that are not easily represented by a linear model. However, it is crucial to be cautious of increased sensitivity to outliers, as indicated by the higher Mean Squared Error in the exponentially transformed model (0.4325) compared to the linear model (0.0327). Further refinement of the model or handling of outliers might be needed to optimize performance.
+    Exponential transformation is particularly useful when modeling data that follows a non-linear growth pattern, such as population increases or resource decay. It can stabilize variance and better capture multiplicative relationships that are not easily represented by a standard linear model. However, this transformation may introduce increased sensitivity to influential points, and we may want to calculate additional diagnostics, like Cook's Distance. While the exponential model provides a better overall fit, addressing influential points may further improve its performance and reduce the impact of extreme residuals.
     """
 )
 
